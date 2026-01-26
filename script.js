@@ -83,23 +83,181 @@ function activateNavLink() {
 window.addEventListener('scroll', activateNavLink);
 
 // ========================================
-// Form Submission Handler - Google Sheets
+// Form Validation Functions
+// ========================================
+
+function validateName(name) {
+    const nameRegex = /^[A-Za-z\s]{2,50}$/;
+    if (!name || name.trim().length === 0) {
+        return { valid: false, message: 'Name is required' };
+    }
+    if (name.trim().length < 2) {
+        return { valid: false, message: 'Name must be at least 2 characters' };
+    }
+    if (!nameRegex.test(name.trim())) {
+        return { valid: false, message: 'Name should only contain letters and spaces' };
+    }
+    return { valid: true, message: '' };
+}
+
+function validateEmail(email) {
+    const emailRegex = /^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$/i;
+    if (!email || email.trim().length === 0) {
+        return { valid: false, message: 'Email is required' };
+    }
+    if (!emailRegex.test(email.trim())) {
+        return { valid: false, message: 'Please enter a valid email address' };
+    }
+    return { valid: true, message: '' };
+}
+
+function validatePhone(phone) {
+    const phoneRegex = /^[0-9]{10}$/;
+    if (!phone || phone.trim().length === 0) {
+        return { valid: false, message: 'Phone number is required' };
+    }
+    const cleanedPhone = phone.replace(/\D/g, ''); // Remove non-digits
+    if (cleanedPhone.length !== 10) {
+        return { valid: false, message: 'Phone number must be exactly 10 digits' };
+    }
+    if (!phoneRegex.test(cleanedPhone)) {
+        return { valid: false, message: 'Please enter a valid 10-digit phone number' };
+    }
+    return { valid: true, message: '' };
+}
+
+function validateBatch(batch) {
+    if (!batch || batch.trim().length === 0) {
+        return { valid: false, message: 'Please select a batch type' };
+    }
+    return { valid: true, message: '' };
+}
+
+// ========================================
+// Form Validation - Real-time
 // ========================================
 
 const contactForm = document.getElementById('contactForm');
-const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxk8fb8f4Bd-UHLcUwV0zNq3LN38nNTpRIPe5zkdHQir13gmV3xsh0za3V3w1Jj9Tt1xA/exec'; // Replace with your Google Apps Script Web App URL
+const nameInput = document.getElementById('name');
+const emailInput = document.getElementById('email');
+const phoneInput = document.getElementById('phone');
+const batchSelect = document.getElementById('batch');
+const messageTextarea = document.getElementById('message');
+
+const nameError = document.getElementById('nameError');
+const emailError = document.getElementById('emailError');
+const phoneError = document.getElementById('phoneError');
+const batchError = document.getElementById('batchError');
+const messageCount = document.getElementById('messageCount');
+
+// Real-time validation
+nameInput.addEventListener('blur', () => {
+    const validation = validateName(nameInput.value);
+    showError(nameInput, nameError, validation);
+});
+
+nameInput.addEventListener('input', () => {
+    if (nameInput.value.trim().length > 0) {
+        const validation = validateName(nameInput.value);
+        showError(nameInput, nameError, validation);
+    }
+});
+
+emailInput.addEventListener('blur', () => {
+    const validation = validateEmail(emailInput.value);
+    showError(emailInput, emailError, validation);
+});
+
+emailInput.addEventListener('input', () => {
+    if (emailInput.value.trim().length > 0) {
+        const validation = validateEmail(emailInput.value);
+        showError(emailInput, emailError, validation);
+    }
+});
+
+phoneInput.addEventListener('blur', () => {
+    const validation = validatePhone(phoneInput.value);
+    showError(phoneInput, phoneError, validation);
+});
+
+phoneInput.addEventListener('input', (e) => {
+    // Only allow digits
+    e.target.value = e.target.value.replace(/\D/g, '');
+    if (phoneInput.value.trim().length > 0) {
+        const validation = validatePhone(phoneInput.value);
+        showError(phoneInput, phoneError, validation);
+    }
+});
+
+batchSelect.addEventListener('change', () => {
+    const validation = validateBatch(batchSelect.value);
+    showError(batchSelect, batchError, validation);
+});
+
+// Message character counter
+messageTextarea.addEventListener('input', () => {
+    const length = messageTextarea.value.length;
+    messageCount.textContent = length;
+    if (length > 500) {
+        messageTextarea.value = messageTextarea.value.substring(0, 500);
+        messageCount.textContent = 500;
+    }
+});
+
+function showError(input, errorElement, validation) {
+    if (validation.valid) {
+        input.classList.remove('error');
+        errorElement.textContent = '';
+        errorElement.style.display = 'none';
+    } else {
+        input.classList.add('error');
+        errorElement.textContent = validation.message;
+        errorElement.style.display = 'block';
+    }
+}
+
+// ========================================
+// Form Submission Handler - Google Sheets
+// ========================================
+
+const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxk8fb8f4Bd-UHLcUwV0zNq3LN38nNTpRIPe5zkdHQir13gmV3xsh0za3V3w1Jj9Tt1xA/exec';
 
 contactForm.addEventListener('submit', async (e) => {
     e.preventDefault();
 
+    // Validate all fields
+    const nameValidation = validateName(nameInput.value);
+    const emailValidation = validateEmail(emailInput.value);
+    const phoneValidation = validatePhone(phoneInput.value);
+    const batchValidation = validateBatch(batchSelect.value);
+
+    // Show errors for all fields
+    showError(nameInput, nameError, nameValidation);
+    showError(emailInput, emailError, emailValidation);
+    showError(phoneInput, phoneError, phoneValidation);
+    showError(batchSelect, batchError, batchValidation);
+
+    // Check if form is valid
+    if (!nameValidation.valid || !emailValidation.valid || !phoneValidation.valid || !batchValidation.valid) {
+        // Scroll to first error
+        const firstError = contactForm.querySelector('.error');
+        if (firstError) {
+            firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            firstError.focus();
+        }
+        return;
+    }
+
     // Get form data
     const formData = new FormData(contactForm);
+    const cleanedPhone = phoneInput.value.replace(/\D/g, '');
+    
     const formDataObj = {
-        name: formData.get('name'),
-        email: formData.get('email'),
-        phone: formData.get('phone'),
-        batch: formData.get('batch'),
-        message: formData.get('message') || '',
+        name: nameInput.value.trim(),
+        email: emailInput.value.trim().toLowerCase(),
+        phone: cleanedPhone,
+        batch: batchSelect.value,
+        message: messageTextarea.value.trim() || '',
         timestamp: new Date().toISOString()
     };
 
@@ -108,6 +266,12 @@ contactForm.addEventListener('submit', async (e) => {
     const originalText = submitButton.textContent;
     submitButton.textContent = 'Submitting...';
     submitButton.disabled = true;
+
+    // Clear all errors
+    [nameError, emailError, phoneError, batchError].forEach(error => {
+        error.textContent = '';
+        error.style.display = 'none';
+    });
 
     try {
         // Submit to Google Sheets via Apps Script
@@ -125,6 +289,10 @@ contactForm.addEventListener('submit', async (e) => {
 
         // Reset form
         contactForm.reset();
+        messageCount.textContent = '0';
+        [nameInput, emailInput, phoneInput, batchSelect].forEach(input => {
+            input.classList.remove('error');
+        });
 
     } catch (error) {
         console.error('Error submitting form:', error);

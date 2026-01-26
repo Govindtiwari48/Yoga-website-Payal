@@ -324,21 +324,28 @@
             <h2 class="section-title center">Start Your Yoga Journey Today</h2>
             <div class="contact-grid">
                 <div class="contact-form-wrapper">
-                    <form class="contact-form" id="contactForm">
+                    <form class="contact-form" id="contactForm" novalidate>
                         <div class="form-group">
-                            <label for="name">Name</label>
-                            <input type="text" id="name" name="name" required>
+                            <label for="name">Name <span class="required">*</span></label>
+                            <input type="text" id="name" name="name" required minlength="2" maxlength="50"
+                                pattern="[A-Za-z\s]+" title="Name should only contain letters and spaces">
+                            <span class="error-message" id="nameError"></span>
                         </div>
                         <div class="form-group">
-                            <label for="email">Email</label>
-                            <input type="email" id="email" name="email" required>
+                            <label for="email">Email <span class="required">*</span></label>
+                            <input type="email" id="email" name="email" required
+                                pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$"
+                                title="Please enter a valid email address">
+                            <span class="error-message" id="emailError"></span>
                         </div>
                         <div class="form-group">
-                            <label for="phone">Phone Number</label>
-                            <input type="tel" id="phone" name="phone" required>
+                            <label for="phone">Phone Number <span class="required">*</span></label>
+                            <input type="tel" id="phone" name="phone" required pattern="[0-9]{10}" minlength="10"
+                                maxlength="10" title="Please enter a valid 10-digit phone number">
+                            <span class="error-message" id="phoneError"></span>
                         </div>
                         <div class="form-group">
-                            <label for="batch">Select Preferred Batch</label>
+                            <label for="batch">Select Preferred Batch <span class="required">*</span></label>
                             <select id="batch" name="batch" required>
                                 <option value="">Choose a batch type</option>
                                 <option value="online">Online Yoga Classes/Sessions</option>
@@ -347,10 +354,12 @@
                                 <option value="personal">At Home Yoga (Personal)</option>
                                 <option value="society">Society Group Classes/Sessions</option>
                             </select>
+                            <span class="error-message" id="batchError"></span>
                         </div>
                         <div class="form-group">
                             <label for="message">Message (Optional)</label>
-                            <textarea id="message" name="message" rows="4"></textarea>
+                            <textarea id="message" name="message" rows="4" maxlength="500"></textarea>
+                            <span class="char-count"><span id="messageCount">0</span>/500</span>
                         </div>
                         <button type="submit" class="btn btn-primary btn-full">Book Trial Class</button>
                     </form>
@@ -399,7 +408,7 @@
                 </div>
             </div>
             <div class="footer-bottom">
-                <p>&copy; 2024 Yoga for wellness. All rights reserved.</p>
+                <p>&copy; 2025 Yoga for wellness. All rights reserved.</p>
             </div>
         </div>
     </footer>

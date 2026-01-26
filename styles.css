@@ -785,12 +785,19 @@ ul {
 .form-group {
     display: flex;
     flex-direction: column;
+    position: relative;
+    margin-bottom: 0.5rem;
 }
 
 .form-group label {
     font-weight: 500;
     color: var(--dark-color);
     margin-bottom: 0.5rem;
+}
+
+.form-group label .required {
+    color: #e74c3c;
+    margin-left: 2px;
 }
 
 .form-group input,
@@ -801,7 +808,8 @@ ul {
     border-radius: 8px;
     font-family: 'Poppins', sans-serif;
     font-size: 1rem;
-    transition: border-color 0.3s ease;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    background: var(--white);
 }
 
 .form-group input:focus,
@@ -809,6 +817,36 @@ ul {
 .form-group textarea:focus {
     outline: none;
     border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(107, 142, 107, 0.1);
+}
+
+.form-group input.error,
+.form-group select.error,
+.form-group textarea.error {
+    border-color: #e74c3c;
+    box-shadow: 0 0 0 3px rgba(231, 76, 60, 0.1);
+}
+
+.form-group input.error:focus,
+.form-group select.error:focus,
+.form-group textarea.error:focus {
+    border-color: #e74c3c;
+    box-shadow: 0 0 0 3px rgba(231, 76, 60, 0.15);
+}
+
+.error-message {
+    display: none;
+    color: #e74c3c;
+    font-size: 0.875rem;
+    margin-top: 0.25rem;
+    font-weight: 400;
+}
+
+.char-count {
+    text-align: right;
+    font-size: 0.75rem;
+    color: var(--text-light);
+    margin-top: 0.25rem;
 }
 
 .contact-info {
