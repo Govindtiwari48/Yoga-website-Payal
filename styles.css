@@ -650,69 +650,32 @@ ul {
     align-items: start;
 }
 
-/* Photo Banner Styles - News Ticker Style */
-.photo-carousel-container {
-    position: relative;
-    width: 100%;
-    max-width: 900px;
-    margin: 0 auto 3rem;
-    overflow: hidden;
-    border-radius: 12px;
-    background: transparent;
-    padding: 15px 0;
-}
-
-.photo-carousel-wrapper {
-    position: relative;
-    width: 100%;
-    overflow: hidden;
-}
-
-.photo-carousel-track {
+/* Photo Gallery - Static Row */
+.photo-gallery-row {
     display: flex;
-    will-change: transform;
-    gap: 15px;
-    animation: scrollBanner 25s linear infinite;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 20px;
+    margin: 0 auto;
+    max-width: 1000px;
+    padding: 20px 0;
 }
 
-.photo-carousel-container:hover .photo-carousel-track {
-    animation-play-state: paused;
-}
-
-@keyframes scrollBanner {
-    0% {
-        transform: translateX(0);
-    }
-    100% {
-        transform: translateX(-50%);
-    }
-}
-
-/* Ensure smooth scrolling on all browsers */
-.photo-carousel-track {
-    -webkit-animation: scrollBanner 25s linear infinite;
-    -moz-animation: scrollBanner 25s linear infinite;
-    -o-animation: scrollBanner 25s linear infinite;
-}
-
-.carousel-slide {
-    min-width: 160px;
-    flex-shrink: 0;
-    aspect-ratio: 1;
-    border-radius: 10px;
-    overflow: hidden;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-    background: var(--light-color);
-}
-
-.carousel-slide:hover {
-    transform: scale(1.08);
+.gallery-photo {
+    width: 200px;
+    height: 200px;
+    object-fit: cover;
+    border-radius: 12px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    cursor: pointer;
 }
 
-.carousel-dots {
-    display: none;
+.gallery-photo:hover {
+    transform: scale(1.05);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
 }
 
 /* Videos Row Styles */
@@ -1029,17 +992,14 @@ ul {
         gap: 20px;
     }
 
-    .photo-carousel-container {
-        max-width: 100%;
-        padding: 12px 0;
+    .photo-gallery-row {
+        gap: 15px;
+        padding: 15px 0;
     }
     
-    .photo-carousel-track {
-        gap: 12px;
-    }
-    
-    .carousel-slide {
-        min-width: 140px;
+    .gallery-photo {
+        width: 160px;
+        height: 160px;
     }
 
     .videos-row {
@@ -1174,17 +1134,15 @@ ul {
         min-width: 100%;
     }
 
-    .photo-carousel-container {
-        padding: 10px 0;
+    .photo-gallery-row {
+        gap: 12px;
+        padding: 12px 0;
     }
     
-    .photo-carousel-track {
-        gap: 10px;
-    }
-    
-    .carousel-slide {
-        min-width: 120px;
-        border-radius: 8px;
+    .gallery-photo {
+        width: 140px;
+        height: 140px;
+        border-radius: 10px;
     }
 
     .contact {

@@ -236,27 +236,12 @@ scrollTopBtn.addEventListener('click', () => {
 });
 
 // ========================================
-// Photo Gallery Continuous Scrolling Banner
+// Photo Gallery - Static Row (No animation needed)
 // ========================================
-
-(function initPhotoBanner() {
-    const carouselTrack = document.getElementById('photoCarousel');
-    
-    if (!carouselTrack) return;
-    
-    // Handle visibility change (pause when tab is hidden)
-    document.addEventListener('visibilitychange', () => {
-        if (document.hidden) {
-            carouselTrack.style.animationPlayState = 'paused';
-        } else {
-            carouselTrack.style.animationPlayState = 'running';
-        }
-    });
-})();
 
 // ========================================
 // Console Message
 // ========================================
 
-console.log('%cYoga with Payal 🧘‍♀️', 'font-size: 20px; color: #6b8e6b; font-weight: bold;');
+console.log('%cYoga for wellness 🧘‍♀️', 'font-size: 20px; color: #6b8e6b; font-weight: bold;');
 console.log('%cWebsite loaded successfully!', 'font-size: 14px; color: #666;');
