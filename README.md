@@ -1,6 +1,6 @@
 # Yoga for wellness - Website
 
-A modern, clean, and responsive single-page website for a yoga instructor offering personalized yoga classes in Navi Mumbai.
+A modern, clean, and responsive single-page website for a yoga instructor offering personalized yoga classes in Mumbai.
 
 ## Features
 
