@@ -28,7 +28,7 @@ document.querySelectorAll('a[href^="#"]').forEach(anchor => {
         e.preventDefault();
         const target = document.querySelector(this.getAttribute('href'));
         if (target) {
-            const offsetTop = target.offsetTop - 70; // Account for fixed navbar
+            const offsetTop = target.offsetTop - 60; // Account for fixed navbar
             window.scrollTo({
                 top: offsetTop,
                 behavior: 'smooth'
@@ -46,15 +46,13 @@ let lastScroll = 0;
 
 window.addEventListener('scroll', () => {
     const currentScroll = window.pageYOffset;
-    
+
     if (currentScroll > 100) {
         navbar.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.15)';
-        navbar.style.padding = '0.5rem 0';
     } else {
         navbar.style.boxShadow = '0 4px 6px rgba(0, 0, 0, 0.1)';
-        navbar.style.padding = '1rem 0';
     }
-    
+
     lastScroll = currentScroll;
 });
 
@@ -66,13 +64,13 @@ const sections = document.querySelectorAll('section[id]');
 
 function activateNavLink() {
     const scrollY = window.pageYOffset;
-    
+
     sections.forEach(section => {
         const sectionHeight = section.offsetHeight;
         const sectionTop = section.offsetTop - 100;
         const sectionId = section.getAttribute('id');
         const navLink = document.querySelector(`.nav-link[href="#${sectionId}"]`);
-        
+
         if (scrollY > sectionTop && scrollY <= sectionTop + sectionHeight) {
             navLinks.forEach(link => link.classList.remove('active'));
             if (navLink) {
@@ -85,47 +83,69 @@ function activateNavLink() {
 window.addEventListener('scroll', activateNavLink);
 
 // ========================================
-// Form Submission Handler
+// Form Submission Handler - Google Sheets
 // ========================================
 
 const contactForm = document.getElementById('contactForm');
+const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxk8fb8f4Bd-UHLcUwV0zNq3LN38nNTpRIPe5zkdHQir13gmV3xsh0za3V3w1Jj9Tt1xA/exec'; // Replace with your Google Apps Script Web App URL
 
-contactForm.addEventListener('submit', (e) => {
+contactForm.addEventListener('submit', async (e) => {
     e.preventDefault();
-    
+
     // Get form data
     const formData = new FormData(contactForm);
-    const name = formData.get('name');
-    const email = formData.get('email');
-    const phone = formData.get('phone');
-    const batch = formData.get('batch');
-    const message = formData.get('message');
-    
-    // Create WhatsApp message
-    const whatsappMessage = `
+    const formDataObj = {
+        name: formData.get('name'),
+        email: formData.get('email'),
+        phone: formData.get('phone'),
+        batch: formData.get('batch'),
+        message: formData.get('message') || '',
+        timestamp: new Date().toISOString()
+    };
+
+    // Show loading state
+    const submitButton = contactForm.querySelector('button[type="submit"]');
+    const originalText = submitButton.textContent;
+    submitButton.textContent = 'Submitting...';
+    submitButton.disabled = true;
+
+    try {
+        // Submit to Google Sheets via Apps Script
+        const response = await fetch(GOOGLE_SCRIPT_URL, {
+            method: 'POST',
+            mode: 'no-cors',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(formDataObj)
+        });
+
+        // Show success message
+        alert('Thank you! Your trial class request has been submitted. We will contact you soon.');
+
+        // Reset form
+        contactForm.reset();
+
+    } catch (error) {
+        console.error('Error submitting form:', error);
+        // Fallback to WhatsApp if Google Sheets fails
+        const whatsappMessage = `
 Hi! I'm interested in joining yoga classes.
 
-Name: ${name}
-Email: ${email}
-Phone: ${phone}
-Preferred Batch: ${batch}
-${message ? `Message: ${message}` : ''}
-    `.trim();
-    
-    // Encode message for URL
-    const encodedMessage = encodeURIComponent(whatsappMessage);
-    
-    // WhatsApp number (replace with actual number)
-    const whatsappNumber = '919324349069';
-    
-    // Open WhatsApp
-    window.open(`https://wa.me/${whatsappNumber}?text=${encodedMessage}`, '_blank');
-    
-    // Show success message
-    alert('Thank you! Redirecting you to WhatsApp...');
-    
-    // Reset form
-    contactForm.reset();
+Name: ${formDataObj.name}
+Email: ${formDataObj.email}
+Phone: ${formDataObj.phone}
+Preferred Batch: ${formDataObj.batch}
+${formDataObj.message ? `Message: ${formDataObj.message}` : ''}
+        `.trim();
+
+        const encodedMessage = encodeURIComponent(whatsappMessage);
+        window.open(`https://wa.me/919769576260?text=${encodedMessage}`, '_blank');
+    } finally {
+        // Reset button state
+        submitButton.textContent = originalText;
+        submitButton.disabled = false;
+    }
 });
 
 // ========================================
@@ -214,6 +234,25 @@ scrollTopBtn.addEventListener('click', () => {
         behavior: 'smooth'
     });
 });
+
+// ========================================
+// Photo Gallery Continuous Scrolling Banner
+// ========================================
+
+(function initPhotoBanner() {
+    const carouselTrack = document.getElementById('photoCarousel');
+    
+    if (!carouselTrack) return;
+    
+    // Handle visibility change (pause when tab is hidden)
+    document.addEventListener('visibilitychange', () => {
+        if (document.hidden) {
+            carouselTrack.style.animationPlayState = 'paused';
+        } else {
+            carouselTrack.style.animationPlayState = 'running';
+        }
+    });
+})();
 
 // ========================================
 // Console Message
