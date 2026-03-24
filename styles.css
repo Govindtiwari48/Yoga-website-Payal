@@ -1082,6 +1082,10 @@ ul {
         font-size: 2rem;
     }
 
+    #testimonials .section-title {
+        font-size: 1.75rem;
+    }
+
     .logo-text {
         font-size: 1.05rem;
     }
@@ -1221,6 +1225,10 @@ ul {
 
     .section-title {
         font-size: 1.8rem;
+    }
+
+    #testimonials .section-title {
+        font-size: 1.5rem;
     }
 
     .logo {
