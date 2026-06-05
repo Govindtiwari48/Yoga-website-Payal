@@ -432,8 +432,48 @@ scrollTopBtn.addEventListener('click', () => {
 });
 
 // ========================================
-// Photo Gallery - Static Row (No animation needed)
+// Photo Gallery Lightbox
 // ========================================
+
+const galleryPhotos = document.querySelectorAll('.gallery-photo');
+const galleryLightbox = document.getElementById('galleryLightbox');
+const galleryLightboxImage = document.querySelector('.gallery-lightbox-image');
+const galleryLightboxClose = document.querySelector('.gallery-lightbox-close');
+
+function openGalleryLightbox(src, alt) {
+    galleryLightboxImage.src = src;
+    galleryLightboxImage.alt = alt;
+    galleryLightbox.classList.add('active');
+    galleryLightbox.setAttribute('aria-hidden', 'false');
+    document.body.classList.add('menu-open');
+}
+
+function closeGalleryLightbox() {
+    galleryLightbox.classList.remove('active');
+    galleryLightbox.setAttribute('aria-hidden', 'true');
+    galleryLightboxImage.src = '';
+    document.body.classList.remove('menu-open');
+}
+
+galleryPhotos.forEach(photo => {
+    photo.addEventListener('click', () => {
+        openGalleryLightbox(photo.src, photo.alt);
+    });
+});
+
+galleryLightboxClose.addEventListener('click', closeGalleryLightbox);
+
+galleryLightbox.addEventListener('click', (event) => {
+    if (event.target === galleryLightbox) {
+        closeGalleryLightbox();
+    }
+});
+
+document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape' && galleryLightbox.classList.contains('active')) {
+        closeGalleryLightbox();
+    }
+});
 
 // ========================================
 // Console Message
