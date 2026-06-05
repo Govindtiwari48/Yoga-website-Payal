@@ -1,4 +1,136 @@
 // ========================================
+// Schedule — Google Sheets
+// Paste your Sheet ID from the URL: docs.google.com/spreadsheets/d/SHEET_ID/edit
+// ========================================
+
+const SCHEDULE_SHEET_ID = '1T3R-0tVk4VFtLOx4oDY4Z6OGkp_UOBgHv8siO4AO86o';
+const SCHEDULE_SHEET_NAME = 'Schedule';
+
+const FALLBACK_SCHEDULE = [
+    { days: 'Mon-Wed-Fri', level: 'Intermediate level', time: '7:30 AM - 8:30 AM', icon: '🌅', active: true },
+    { days: 'Tues-Thurs-Sat', level: 'Intermediate level', time: '6:00 AM - 7:00 AM', icon: '🌆', active: true },
+    { days: 'Mon-Wed-Fri', level: 'Beginners to intermediate level', time: '5:30 PM - 6:30 PM', icon: '🌙', active: true },
+    { days: 'Mon-Wed-Fri', level: 'Beginners to intermediate level', time: '6:30 PM - 7:30 PM', icon: '🌙', active: true },
+    { days: 'Flexible Sessions', level: 'At requested time slots', time: 'Flexible timings available', icon: '⏰', active: true }
+];
+
+function isScheduleActive(value) {
+    if (value === undefined || value === null || String(value).trim() === '') {
+        return true;
+    }
+    const normalized = String(value).trim().toLowerCase();
+    return !['false', 'no', 'n', '0', 'hide', 'hidden', 'inactive'].includes(normalized);
+}
+
+function normalizeScheduleRow(row) {
+    const get = (...keys) => {
+        for (const key of keys) {
+            if (row[key] !== undefined && row[key] !== null && String(row[key]).trim() !== '') {
+                return String(row[key]).trim();
+            }
+        }
+        return '';
+    };
+
+    return {
+        days: get('Days', 'days'),
+        level: get('Level', 'level'),
+        time: get('Time', 'time'),
+        icon: get('Icon', 'icon') || '🧘',
+        active: isScheduleActive(get('Active', 'active') || true)
+    };
+}
+
+function parseGoogleSheetJson(text) {
+    const json = JSON.parse(text.substring(47).slice(0, -2));
+    const cols = json.table.cols.map(col => col.label);
+    const rows = json.table.rows || [];
+
+    return rows.map(row => {
+        const entry = {};
+        cols.forEach((label, index) => {
+            const cell = row.c[index];
+            entry[label] = cell ? (cell.v ?? cell.f ?? '') : '';
+        });
+        return entry;
+    });
+}
+
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+
+function createScheduleCard({ days, level, time, icon }) {
+    const card = document.createElement('div');
+    card.className = 'schedule-card';
+    card.innerHTML = `
+        <div class="schedule-icon">${escapeHtml(icon)}</div>
+        <h3>${escapeHtml(days)}</h3>
+        <p class="schedule-level">${escapeHtml(level)}</p>
+        <p class="schedule-time">${escapeHtml(time)}</p>
+    `;
+    return card;
+}
+
+function renderSchedule(items) {
+    const scheduleGrid = document.getElementById('scheduleGrid');
+    if (!scheduleGrid) {
+        return;
+    }
+
+    const activeItems = items
+        .map(normalizeScheduleRow)
+        .filter(item => item.days && item.level && item.time && item.active);
+
+    scheduleGrid.innerHTML = '';
+
+    if (activeItems.length === 0) {
+        scheduleGrid.innerHTML = '<p class="schedule-error">No classes scheduled right now. Please check back soon.</p>';
+        return;
+    }
+
+    activeItems.forEach(item => {
+        scheduleGrid.appendChild(createScheduleCard(item));
+    });
+
+    observeAnimatedElements('.schedule-card');
+}
+
+async function loadScheduleFromGoogleSheet() {
+    const scheduleGrid = document.getElementById('scheduleGrid');
+
+    if (!SCHEDULE_SHEET_ID || SCHEDULE_SHEET_ID === 'YOUR_SCHEDULE_SHEET_ID_HERE') {
+        renderSchedule(FALLBACK_SCHEDULE);
+        return;
+    }
+
+    try {
+        const url = `https://docs.google.com/spreadsheets/d/${SCHEDULE_SHEET_ID}/gviz/tq?tqx=out:json&sheet=${encodeURIComponent(SCHEDULE_SHEET_NAME)}`;
+        const response = await fetch(url);
+
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}`);
+        }
+
+        const text = await response.text();
+        const rows = parseGoogleSheetJson(text);
+
+        if (rows.length === 0) {
+            throw new Error('Schedule sheet is empty');
+        }
+
+        renderSchedule(rows);
+    } catch (error) {
+        console.error('Failed to load schedule from Google Sheet:', error);
+        renderSchedule(FALLBACK_SCHEDULE);
+    }
+}
+
+loadScheduleFromGoogleSheet();
+
+// ========================================
 // Navigation Toggle for Mobile
 // ========================================
 
@@ -362,15 +494,20 @@ const observer = new IntersectionObserver((entries) => {
     });
 }, observerOptions);
 
-// Observe all class cards, testimonial cards, and schedule cards
-const animatedElements = document.querySelectorAll('.class-card, .testimonial-card, .schedule-card, .gallery-item');
+function observeAnimatedElements(selector) {
+    document.querySelectorAll(selector).forEach(element => {
+        if (element.dataset.observed === 'true') {
+            return;
+        }
+        element.dataset.observed = 'true';
+        element.style.opacity = '0';
+        element.style.transform = 'translateY(30px)';
+        element.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+        observer.observe(element);
+    });
+}
 
-animatedElements.forEach(element => {
-    element.style.opacity = '0';
-    element.style.transform = 'translateY(30px)';
-    element.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
-    observer.observe(element);
-});
+observeAnimatedElements('.class-card, .testimonial-card, .gallery-item');
 
 // ========================================
 // Gallery Image Lazy Loading (Placeholder)

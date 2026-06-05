@@ -615,6 +615,19 @@ ul {
     font-size: 1.1rem;
 }
 
+.schedule-loading,
+.schedule-error {
+    grid-column: 1 / -1;
+    text-align: center;
+    color: var(--text-light);
+    font-size: 1rem;
+    margin: 0;
+}
+
+.schedule-error {
+    color: #8b5a2b;
+}
+
 /* ========================================
    Gallery Section
    ======================================== */

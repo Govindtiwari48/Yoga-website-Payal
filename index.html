@@ -336,41 +336,12 @@
         </div>
     </section>
 
-    <!-- Schedule Section -->
+    <!-- Schedule Section (loaded from Google Sheet) -->
     <section id="schedule" class="schedule">
         <div class="container">
             <h2 class="section-title center">Schedule (Online Classes)</h2>
-            <div class="schedule-grid">
-                <div class="schedule-card">
-                    <div class="schedule-icon">🌅</div>
-                    <h3>Mon-Wed-Fri</h3>
-                    <p class="schedule-level">Intermediate level</p>
-                    <p class="schedule-time">7:30 AM - 8:30 AM</p>
-                </div>
-                <div class="schedule-card">
-                    <div class="schedule-icon">🌆</div>
-                    <h3>Tues-Thurs-Sat</h3>
-                    <p class="schedule-level">Intermediate level</p>
-                    <p class="schedule-time">6:00 AM - 7:00 AM</p>
-                </div>
-                <div class="schedule-card">
-                    <div class="schedule-icon">🌙</div>
-                    <h3>Mon-Wed-Fri</h3>
-                    <p class="schedule-level">Beginners to intermediate level</p>
-                    <p class="schedule-time">5:30 PM - 6:30 PM</p>
-                </div>
-                <div class="schedule-card">
-                    <div class="schedule-icon">🌙</div>
-                    <h3>Mon-Wed-Fri</h3>
-                    <p class="schedule-level">Beginners to intermediate level</p>
-                    <p class="schedule-time">6:30 PM - 7:30 PM</p>
-                </div>
-                <div class="schedule-card">
-                    <div class="schedule-icon">⏰</div>
-                    <h3>Flexible Sessions</h3>
-                    <p class="schedule-level">At requested time slots</p>
-                    <p class="schedule-time">Flexible timings available</p>
-                </div>
+            <div class="schedule-grid" id="scheduleGrid">
+                <p class="schedule-loading">Loading schedule...</p>
             </div>
         </div>
     </section>
